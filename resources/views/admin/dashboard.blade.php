@@ -33,7 +33,7 @@
                 <div class="flex items-center justify-between border-b border-slate-200 px-5 py-3.5">
                     <h3 class="text-base font-semibold text-slate-800">Users</h3>
                     <a href="{{ route('admin.users.create') }}"
-                       class="inline-flex items-center rounded-lg bg-blue-600 px-3 py-2 text-white hover:bg-blue-700">
+                        class="inline-flex items-center rounded-lg bg-blue-600 px-3 py-2 text-white hover:bg-blue-700">
                         Create user
                     </a>
                 </div>
@@ -42,11 +42,28 @@
                     <table class="min-w-full divide-y divide-slate-200">
                         <thead class="bg-slate-50">
                             <tr>
-                                <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">ID</th>
-                                <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Name</th>
-                                <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Email</th>
-                                <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Role</th>
-                                <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Created</th>
+                                <th
+                                    class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
+                                    ID</th>
+                                <th
+                                    class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
+                                    Name</th>
+                                <th
+                                    class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
+                                    Email</th>
+                                <th
+                                    class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
+                                    Phone</th>
+                                <th
+                                    class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
+                                    Job Role</th>
+                                <th
+                                    class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
+                                    Admin
+                                </th>
+                                <th
+                                    class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
+                                    Created</th>
                                 <th class="px-5 py-3"></th>
                             </tr>
                         </thead>
@@ -56,30 +73,37 @@
                                     <td class="px-5 py-3 text-slate-900">{{ $user->id }}</td>
                                     <td class="px-5 py-3 text-slate-900">{{ $user->name }}</td>
                                     <td class="px-5 py-3 text-slate-900">{{ $user->email }}</td>
-                                    <td class="px-5 py-3">
-                                        @if($user->is_admin)
-                                            <span class="inline-flex items-center rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-medium text-purple-800 ring-1 ring-inset ring-purple-200">
-                                                Admin
+                                    <td class="px-5 py-3 text-slate-900">{{ $user->phone ?? '—' }}</td>
+                                    <td class="px-5 py-3 text-slate-900">
+                                        {{ $user->jobRole?->name ?? '—' }}
+                                    </td>
+                                    <td class="px-5 py-3 text-slate-900">
+                                        @if ($user->is_admin)
+                                            <span class="inline-flex items-center gap-1 text-green-600 font-medium">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                    stroke-width="2" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M5 13l4 4L19 7" />
+                                                </svg>
+                                                Yes
                                             </span>
                                         @else
-                                            <span class="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700 ring-1 ring-inset ring-slate-200">
-                                                Member
-                                            </span>
+                                            <span class="text-slate-500">No</span>
                                         @endif
                                     </td>
                                     <td class="px-5 py-3 text-slate-900">{{ $user->created_at->format('Y-m-d') }}</td>
                                     <td class="px-5 py-3 text-right">
                                         <div class="inline-flex items-center gap-2">
                                             <a href="{{ route('admin.users.edit', $user) }}"
-                                               class="rounded-lg bg-amber-500 px-3 py-1.5 text-white hover:bg-amber-600">
+                                                class="rounded-lg bg-amber-500 px-3 py-1.5 text-white hover:bg-amber-600">
                                                 Edit
                                             </a>
                                             <form method="POST" action="{{ route('admin.users.destroy', $user) }}"
-                                                  onsubmit="return confirm('Delete this user?');">
+                                                onsubmit="return confirm('Delete this user?');">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit"
-                                                        class="rounded-lg bg-red-600 px-3 py-1.5 text-white hover:bg-red-700">
+                                                    class="rounded-lg bg-red-600 px-3 py-1.5 text-white hover:bg-red-700">
                                                     Delete
                                                 </button>
                                             </form>
@@ -88,7 +112,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td class="px-5 py-6 text-slate-500" colspan="6">No users found.</td>
+                                    <td class="px-5 py-6 text-slate-500" colspan="7">No users found.</td>
                                 </tr>
                             @endforelse
                         </tbody>

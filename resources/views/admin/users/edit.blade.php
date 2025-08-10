@@ -9,10 +9,9 @@
         </div>
     </x-slot>
 
-
     <div class="py-10 px-4">
         <div class="max-w-2xl mx-auto bg-white p-6 rounded shadow">
-            <x-user-form :action="route('admin.users.update', $user)" method="PUT" submit-label="Update user" :user="$user" />
+            <x-admin-user-form :action="route('admin.users.update', $user)" :user="$user" method="PUT" submit-label="Update user" />
         </div>
     </div>
 </x-admin-layout>

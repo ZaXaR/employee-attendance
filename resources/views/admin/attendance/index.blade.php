@@ -39,14 +39,16 @@
                         {{-- Date filters --}}
                         <div class="flex flex-col">
                             <label class="text-sm font-medium text-slate-600 mb-1">From</label>
-                            <input type="date" name="from" value="{{ $filters['from'] }}"
-                                class="rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm focus:ring focus:ring-blue-200">
+                            <input type="text" name="from" value="{{ $filters['from'] }}"
+                                class="datepicker rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm focus:ring focus:ring-blue-200"
+                                placeholder="YYYY-MM-DD">
                         </div>
 
                         <div class="flex flex-col">
                             <label class="text-sm font-medium text-slate-600 mb-1">To</label>
-                            <input type="date" name="to" value="{{ $filters['to'] }}"
-                                class="rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm focus:ring focus:ring-blue-200">
+                            <input type="text" name="to" value="{{ $filters['to'] }}"
+                                class="datepicker rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm focus:ring focus:ring-blue-200"
+                                placeholder="YYYY-MM-DD">
                         </div>
 
                         {{-- Filter actions --}}
@@ -84,29 +86,57 @@
                                 </select>
                             </div>
 
-                            {{-- Date --}}
+                            {{-- Work Date --}}
                             <div>
-                                <label class="block text-sm font-medium text-slate-600 mb-1">Work Date (UTC)</label>
-                                <input type="date" name="work_date" required
-                                    class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm">
+                                <label for="work_date" class="text-sm font-semibold text-slate-700 mb-1 block">Work Date
+                                    (UTC)</label>
+                                <input type="text" name="work_date" id="work_date"
+                                    value="{{ now()->utc()->format('Y-m-d') }}"
+                                    class="datepicker w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm
+        focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                    placeholder="YYYY-MM-DD">
                             </div>
 
-                            {{-- Clock in --}}
-                            <div>
-                                <label class="block text-sm font-medium text-slate-600 mb-1">Clock In (HH:MM)</label>
-                                <input type="time" name="clock_in"
-                                    class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm">
+                            {{-- Clock In --}}
+                            <div class="flex flex-col gap-1 sm:col-span-1">
+                                <label for="clock_in" class="text-sm font-semibold text-slate-700">
+                                    Clock In <span class="text-xs text-slate-400">(HH:MM, UTC)</span>
+                                </label>
+                                <div class="flex items-center gap-2">
+                                    <input type="text" name="clock_in" id="clock_in"
+                                        value="{{ now()->utc()->format('H:i') }}"
+                                        class="timepicker w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm
+                  focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50
+                  placeholder:text-slate-400"
+                                        placeholder="HH:MM">
+                                    <button type="button" onclick="document.getElementById('clock_in').value = ''"
+                                        class="text-slate-400 hover:text-red-500 px-2 text-lg font-bold leading-none"
+                                        title="Clear">
+                                        ×
+                                    </button>
+                                </div>
                             </div>
 
-                            {{-- Clock out --}}
-                            <div>
-                                <label class="block text-sm font-medium text-slate-600 mb-1">Clock Out (HH:MM)</label>
-                                <input type="time" name="clock_out"
-                                    class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm">
+                            {{-- Clock Out --}}
+                            <div class="flex flex-col gap-1 sm:col-span-1">
+                                <label for="clock_out" class="text-sm font-medium text-slate-600">Clock Out
+                                    (HH:MM)</label>
+                                <div class="flex items-center gap-2">
+                                    <input type="text" name="clock_out" id="clock_out"
+                                        class="timepicker w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm
+                  focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50
+                  placeholder:text-slate-400"
+                                        placeholder="HH:MM">
+                                    <button type="button" onclick="document.getElementById('clock_out').value = ''"
+                                        class="text-slate-400 hover:text-red-500 px-2 text-lg font-bold leading-none"
+                                        title="Clear">
+                                        ×
+                                    </button>
+                                </div>
                             </div>
 
                             {{-- Submit --}}
-                            <div class="flex items-end">
+                            <div class="flex items-end sm:col-span-1 h-full">
                                 <button type="submit"
                                     class="inline-flex items-center bg-emerald-600 text-white px-4 py-2.5 rounded-lg text-sm hover:bg-emerald-700 transition shadow-sm">
                                     Save
@@ -122,7 +152,7 @@
                         <h3 class="text-base font-semibold text-slate-800">Records</h3>
                     </div>
 
-                    <div class="overflow-x-auto">
+                    <div x-data="{ openId: null }" class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-slate-200">
                             <thead class="bg-slate-50">
                                 <tr>
@@ -175,73 +205,10 @@
                                             @endif
                                         </td>
                                         <td class="px-5 py-3 text-slate-900">
-                                            <details class="group">
-                                                <summary
-                                                    class="inline-flex items-center gap-2 rounded-lg bg-slate-100 px-3 py-1.5 text-slate-800 ring-1 ring-inset ring-slate-200 hover:bg-slate-200 cursor-pointer">
-                                                    Edit
-                                                </summary>
-                                                <div
-                                                    class="mt-3 w-[640px] max-w-full rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-
-                                                    <form method="POST"
-                                                        action="{{ route('admin.attendance.update', $r) }}"
-                                                        class="grid grid-cols-1 sm:grid-cols-6 gap-3">
-                                                        @csrf
-                                                        @method('PATCH')
-                                                        <div class="sm:col-span-2">
-                                                            <label
-                                                                class="block text-sm text-slate-600 mb-1">User</label>
-                                                            <select name="user_id"
-                                                                class="w-full rounded-lg border-slate-300">
-                                                                @foreach ($users as $u)
-                                                                    <option value="{{ $u->id }}"
-                                                                        @selected($u->id == $r->user_id)>
-                                                                        {{ $u->name }}</option>
-                                                                @endforeach
-                                                            </select>
-                                                        </div>
-                                                        <div>
-                                                            <label class="block text-sm text-slate-600 mb-1">Date
-                                                                (UTC)
-                                                            </label>
-                                                            <input type="date" name="work_date"
-                                                                value="{{ optional($r->work_date)->toDateString() }}"
-                                                                class="w-full rounded-lg border-slate-300" required>
-                                                        </div>
-                                                        <div>
-                                                            <label class="block text-sm text-slate-600 mb-1">Clock
-                                                                in</label>
-                                                            <input type="time" name="clock_in"
-                                                                value="{{ optional($r->clock_in)->format('H:i') }}"
-                                                                class="w-full rounded-lg border-slate-300">
-                                                        </div>
-                                                        <div>
-                                                            <label class="block text-sm text-slate-600 mb-1">Clock
-                                                                out</label>
-                                                            <input type="time" name="clock_out"
-                                                                value="{{ optional($r->clock_out)->format('H:i') }}"
-                                                                class="w-full rounded-lg border-slate-300">
-                                                        </div>
-                                                        <div class="flex items-end gap-2">
-                                                            <button type="submit"
-                                                                class="inline-flex items-center rounded-lg bg-emerald-600 px-3 py-2 text-white hover:bg-emerald-700 transition">
-                                                                Save
-                                                            </button>
-                                                            <form method="POST"
-                                                                action="{{ route('admin.attendance.destroy', $r) }}"
-                                                                onsubmit="return confirm('Delete this record?')">
-                                                                @csrf
-                                                                @method('DELETE')
-                                                                <button type="submit"
-                                                                    class="inline-flex items-center rounded-lg bg-red-600 px-3 py-2 text-white hover:bg-red-700 transition">
-                                                                    Delete
-                                                                </button>
-                                                            </form>
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                            </details>
+                                            <button @click="$store.attendanceModal = {{ $r->id }}"
+                                                class="text-sm text-blue-600 hover:underline">Edit</button>
                                         </td>
+
                                     </tr>
                                 @empty
                                     <tr>
@@ -250,6 +217,12 @@
                                 @endforelse
                             </tbody>
                         </table>
+
+                        @foreach ($records as $r)
+                            <x-admin-attendance-edit :record="$r" :users="$users" />
+                        @endforeach
+
+
                     </div>
 
                     @if ($records->hasPages())

@@ -11,7 +11,7 @@
 
     <div class="py-10 px-4">
         <div class="max-w-2xl mx-auto bg-white p-6 rounded shadow">
-            <x-user-form :action="route('admin.users.store')" method="POST" submit-label="Create user" />
+            <x-admin-user-form :action="route('admin.users.store')" method="POST" submit-label="Create user" />
         </div>
     </div>
 </x-admin-layout>

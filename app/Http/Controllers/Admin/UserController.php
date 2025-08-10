@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\JobRole;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
 use App\Providers\RouteServiceProvider;
-
 
 class UserController extends Controller
 {
@@ -28,17 +28,20 @@ class UserController extends Controller
         return view('admin.dashboard', compact('stats', 'users'));
     }
 
-    public function index()
+    public function index(): View
     {
         // List all users with pagination
-        $users = User::paginate(10);
+        $users = User::with('jobRole')->paginate(10);
+
         return view('admin.users.index', compact('users'));
     }
 
-    public function create()
+    public function create(): View
     {
         // Show form to create a new user
-        return view('admin.users.create');
+        $roles = JobRole::all();
+
+        return view('admin.users.create', compact('roles'));
     }
 
     public function store(Request $request)
@@ -48,6 +51,8 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
             'password' => 'required|string|min:6',
+            'phone' => 'nullable|string|max:20',
+            'job_role_id' => 'nullable|exists:job_roles,id',
             'is_admin' => 'sometimes|boolean',
         ]);
 
@@ -57,14 +62,16 @@ class UserController extends Controller
 
         // Create new user
         User::create($validated);
-        return redirect(RouteServiceProvider::ADMIN_HOME)->with('success', 'User created successfully');
 
+        return redirect(RouteServiceProvider::ADMIN_HOME)->with('success', 'User created successfully');
     }
 
-    public function edit(User $user)
+    public function edit(User $user): View
     {
         // Show edit form
-        return view('admin.users.edit', compact('user'));
+        $roles = JobRole::all();
+
+        return view('admin.users.edit', compact('user', 'roles'));
     }
 
     public function update(Request $request, User $user)
@@ -74,11 +81,13 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
             'password' => 'nullable|string|min:6',
+            'phone' => 'nullable|string|max:20',
+            'job_role_id' => 'nullable|exists:job_roles,id',
             'is_admin' => 'sometimes|boolean',
         ]);
 
         // Update password if provided
-        if ($validated['password']) {
+        if (!empty($validated['password'])) {
             $validated['password'] = Hash::make($validated['password']);
         } else {
             unset($validated['password']);
@@ -94,6 +103,7 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
+        // Prevent self-deletion
         if (auth()->id() === $user->id) {
             return back()->with('error', 'You cannot delete your own account.');
         }
@@ -102,5 +112,4 @@ class UserController extends Controller
 
         return redirect(RouteServiceProvider::ADMIN_HOME)->with('success', 'User deleted successfully');
     }
-
 }

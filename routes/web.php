@@ -7,6 +7,8 @@ use App\Models\AttendanceRecord;
 use Carbon\Carbon;
 use App\Http\Controllers\EmployeeAttendanceController;
 use App\Http\Controllers\Admin\AttendancesController;
+use App\Http\Controllers\Admin\JobRoleController;
+use App\Http\Controllers\Admin\LocationController;
 
 
 /*
@@ -21,8 +23,9 @@ use App\Http\Controllers\Admin\AttendancesController;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 });
+
 
 Route::get('/dashboard', function () {
     $user = Auth::user();
@@ -62,21 +65,40 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// All admin routes are protected by 'auth' and 'admin' middleware
-Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
-    Route::get('/dashboard', [UserController::class, 'dashboard'])->name('admin.dashboard');
-    Route::get('/users', [UserController::class, 'index'])->name('admin.users.index');
-    Route::get('/users/create', [UserController::class, 'create'])->name('admin.users.create');
-    Route::post('/users', [UserController::class, 'store'])->name('admin.users.store');
-    Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('admin.users.edit');
-    Route::put('/users/{user}', [UserController::class, 'update'])->name('admin.users.update');
-    Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('admin.users.destroy');
-    Route::get('/attendance', [AttendancesController::class, 'index'])->name('admin.attendance.index');
-    Route::post('/attendance', [AttendancesController::class, 'store'])->name('admin.attendance.store');
-    Route::patch('/attendance/{record}', [AttendancesController::class, 'update'])->name('admin.attendance.update');
-    Route::delete('/attendance/{record}', [AttendancesController::class, 'destroy'])->name('admin.attendance.destroy');
+Route::middleware(['auth', 'admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
 
-});
+        // Dashboard
+        Route::get('/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
+
+        // Users
+        Route::prefix('users')->name('users.')->group(function () {
+            Route::get('/', [UserController::class, 'index'])->name('index');
+            Route::get('/create', [UserController::class, 'create'])->name('create');
+            Route::post('/', [UserController::class, 'store'])->name('store');
+            Route::get('/{user}/edit', [UserController::class, 'edit'])->name('edit');
+            Route::put('/{user}', [UserController::class, 'update'])->name('update');
+            Route::delete('/{user}', [UserController::class, 'destroy'])->name('destroy');
+        });
+
+        // Attendance
+        Route::prefix('attendance')->name('attendance.')->group(function () {
+            Route::get('/', [AttendancesController::class, 'index'])->name('index');
+            Route::post('/', [AttendancesController::class, 'store'])->name('store');
+            Route::patch('/{record}', [AttendancesController::class, 'update'])->name('update');
+            Route::delete('/{record}', [AttendancesController::class, 'destroy'])->name('destroy');
+        });
+
+        // Job Roles
+        Route::resource('job-roles', JobRoleController::class)->except(['show']);
+
+        // Locations
+        Route::resource('locations', LocationController::class)->except(['show', 'destroy']);
+
+    });
+
 
 
 
