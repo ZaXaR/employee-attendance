@@ -34,15 +34,6 @@
         {{-- Clock Out --}}
         <x-time-input name="clock_out" />
 
-        {{-- Break Time --}}
-        <div>
-            <label for="break_time" class="text-sm font-medium text-slate-600 mb-1">Break (minutes)</label>
-            <input type="number" name="break_time" id="break_time" min="0"
-                class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm
-                       focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                placeholder="e.g. 30">
-        </div>
-
         {{-- Location --}}
         <div class="sm:col-span-2">
             <label for="location_id" class="text-sm font-medium text-slate-600 mb-1">Location</label>
@@ -55,8 +46,17 @@
             </select>
         </div>
 
+        {{-- Break Time --}}
+        <div>
+            <label for="break_time" class="text-sm font-medium text-slate-600 mb-1">Break (minutes)</label>
+            <input type="number" name="break_time" id="break_time" min="0"
+                class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm
+                       focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                placeholder="e.g. 30">
+        </div>
+
         {{-- Notes --}}
-        <div class="sm:col-span-4">
+        <div class="sm:col-span-6">
             <label for="notes" class="text-sm font-medium text-slate-600 mb-1">Notes</label>
             <textarea name="notes" id="notes" rows="2"
                 class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm

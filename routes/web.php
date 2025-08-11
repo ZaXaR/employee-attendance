@@ -1,79 +1,44 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\UserController;
-use Illuminate\Support\Facades\Route;
-use App\Models\AttendanceRecord;
-use Carbon\Carbon;
-use App\Http\Controllers\EmployeeAttendanceController;
 use App\Http\Controllers\Admin\AttendancesController;
 use App\Http\Controllers\Admin\JobRoleController;
 use App\Http\Controllers\Admin\LocationController;
-
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
 */
 
-Route::get('/', function () {
-    return redirect()->route('login');
-});
+// 🔐 Redirect root to login
+Route::get('/', fn() => redirect()->route('login'));
 
-
-Route::get('/dashboard', function () {
-    $user = Auth::user();
-    $today = Carbon::today('UTC')->toDateString();
-
-    $todayRecord = AttendanceRecord::where('user_id', $user->id)
-        ->where('work_date', $today)
-        ->first();
-
-    $records = AttendanceRecord::where('user_id', $user->id)
-        ->orderByDesc('work_date')
-        ->limit(30)
-        ->get();
-
-    $hasClockIn = $todayRecord !== null;
-    $hasClockOut = $todayRecord && $todayRecord->clock_out !== null;
-
-    return view('dashboard', compact('records', 'hasClockIn', 'hasClockOut'));
-})->middleware(['auth'])->name('dashboard');
-
+// 🔒 Authenticated user routes
 Route::middleware('auth')->group(function () {
-    Route::post('/attendance/clock-in', [EmployeeAttendanceController::class, 'clockIn'])
-        ->name('attendance.clock-in');
+    // ✅ User attendance dashboard (dashboard.blade.php)
+    Route::get('/dashboard', [AttendancesController::class, 'dashboard'])->name('dashboard');
 
-    Route::post('/attendance/clock-out', [EmployeeAttendanceController::class, 'clockOut'])
-        ->name('attendance.clock-out');
+    // ✅ User creates attendance record
+    Route::post('/attendance/store', [AttendancesController::class, 'store'])->name('attendance.store');
 
-    Route::get('/attendance', [EmployeeAttendanceController::class, 'index'])
-        ->name('attendance.index');
-});
-
-
-
-Route::middleware('auth')->group(function () {
+    // 👤 Profile management
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+// 🛡️ Admin-only routes
 Route::middleware(['auth', 'admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
-
-        // Dashboard
+        // 🧭 Admin dashboard
         Route::get('/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
 
-        // Users
+        // 👥 User management
         Route::prefix('users')->name('users.')->group(function () {
             Route::get('/', [UserController::class, 'index'])->name('index');
             Route::get('/create', [UserController::class, 'create'])->name('create');
@@ -83,7 +48,7 @@ Route::middleware(['auth', 'admin'])
             Route::delete('/{user}', [UserController::class, 'destroy'])->name('destroy');
         });
 
-        // Attendance
+        // 📅 Attendance management
         Route::prefix('attendance')->name('attendance.')->group(function () {
             Route::get('/', [AttendancesController::class, 'index'])->name('index');
             Route::post('/', [AttendancesController::class, 'store'])->name('store');
@@ -91,15 +56,12 @@ Route::middleware(['auth', 'admin'])
             Route::delete('/{record}', [AttendancesController::class, 'destroy'])->name('destroy');
         });
 
-        // Job Roles
+        // 🧩 Job roles
         Route::resource('job-roles', JobRoleController::class)->except(['show']);
 
-        // Locations
+        // 📍 Locations
         Route::resource('locations', LocationController::class)->except(['show', 'destroy']);
-
     });
 
-
-
-
+// 🔐 Auth scaffolding
 require __DIR__ . '/auth.php';

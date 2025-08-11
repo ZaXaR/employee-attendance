@@ -41,10 +41,40 @@ class AttendancesController extends Controller
         return view('admin.attendance.index', compact('users', 'locations', 'records', 'filters'));
     }
 
+    public function dashboard()
+    {
+        $user = auth()->user();
+        $today = now('UTC')->toDateString();
+
+        $hasTodayRecord = AttendanceRecord::where('user_id', $user->id)
+            ->whereDate('work_date', $today)
+            ->exists();
+
+        $records = AttendanceRecord::where('user_id', $user->id)
+            ->orderByDesc('work_date')
+            ->orderByDesc('clock_in')
+            ->take(10)
+            ->get();
+
+        $locations = Location::orderBy('name')->get();
+
+        return view('dashboard', compact('records', 'hasTodayRecord', 'locations'));
+    }
+
     public function store(Request $request)
     {
         $data = $this->validatePayload($request);
         [$clockIn, $clockOut] = $this->assembleTimes($data['work_date'], $data['clock_in'], $data['clock_out']);
+
+        $exists = AttendanceRecord::where('user_id', $data['user_id'])
+            ->whereDate('work_date', $data['work_date'])
+            ->exists();
+
+        if ($exists) {
+            return back()
+                ->withErrors(['work_date' => 'This user already has a record for this date.'])
+                ->withInput();
+        }
 
         if ($clockIn && $clockOut && $clockOut->lte($clockIn)) {
             return back()->withErrors(['clock_out' => 'Clock out must be after clock in'])->withInput();
@@ -111,16 +141,40 @@ class AttendancesController extends Controller
 
     private function validatePayload(Request $request): array
     {
-        return $request->validate([
-            'user_id' => ['required', Rule::exists('users', 'id')],
-            'work_date' => ['required', 'date'],
-            'clock_in' => ['nullable', 'date_format:H:i'],
-            'clock_out' => ['nullable', 'date_format:H:i'],
-            'location_id' => ['nullable', Rule::exists('locations', 'id')],
-            'break_time' => ['nullable', 'integer', 'min:0'],
-            'notes' => ['nullable', 'string', 'max:1000'],
-        ]);
+        $isAdmin = $request->user()->isAdmin();
+
+        if ($isAdmin) {
+            // Admin rules
+            $rules = [
+                'user_id' => ['required', Rule::exists('users', 'id')],
+                'work_date' => ['required', 'date'],
+                'clock_in' => ['nullable', 'date_format:H:i'],
+                'clock_out' => ['nullable', 'date_format:H:i'],
+                'break_time' => ['nullable', 'integer', 'min:0'],
+                'location_id' => ['nullable', Rule::exists('locations', 'id')],
+                'notes' => ['nullable', 'string', 'max:1000'],
+            ];
+        } else {
+            // User rules
+            $rules = [
+                'clock_in' => ['required', 'date_format:H:i'],
+                'clock_out' => ['required', 'date_format:H:i'],
+                'break_time' => ['required', 'integer', 'min:0'],
+                'location_id' => ['required', Rule::exists('locations', 'id')],
+                'notes' => ['nullable', 'string', 'max:1000'],
+            ];
+        }
+
+        $validated = $request->validate($rules);
+
+        if (!$isAdmin) {
+            $validated['user_id'] = $request->user()->id;
+            $validated['work_date'] = now('UTC')->toDateString();
+        }
+
+        return $validated;
     }
+
 
     private function assembleTimes(string $date, ?string $in, ?string $out): array
     {
