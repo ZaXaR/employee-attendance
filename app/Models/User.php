@@ -15,8 +15,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'phone',         // ✅ добавлено
-        'job_role_id',   // ✅ добавлено
+        'phone',
+        'job_role_id',
         'is_admin',
     ];
 
@@ -29,19 +29,21 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    // 📌 Связь с посещениями
     public function attendanceRecords()
     {
         return $this->hasMany(AttendanceRecord::class);
     }
 
-    // 📌 Связь с должностью
     public function jobRole()
     {
         return $this->belongsTo(JobRole::class);
     }
 
-    // 📌 (опционально) Связь с локацией
+    public function isAdmin(): bool
+    {
+        return (bool) $this->is_admin;
+    }
+
     // public function location()
     // {
     //     return $this->belongsTo(Location::class);
