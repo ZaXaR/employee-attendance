@@ -45,12 +45,10 @@
                     {{-- Notes (open fixed modal) --}}
                     <td class="px-6 py-4 text-gray-700">
                         @if ($r->notes)
-                            <button
-                                type="button"
+                            <button type="button"
                                 onclick="window.dispatchEvent(new CustomEvent('open-note', { detail: {{ $r->id }} }))"
                                 class="inline-flex items-center gap-1 px-2 py-1 text-xs rounded bg-amber-100 text-amber-800 hover:bg-amber-200"
-                                title="View note"
-                            >
+                                title="View note">
                                 Note
                             </button>
                         @else
@@ -82,11 +80,7 @@
     {{-- Render note modals (fixed, outside table flow) --}}
     @foreach ($records as $r)
         @if ($r->notes)
-            <x-ui.note-modal
-                :id="$r->id"
-                :user="$r->user->name"
-                :text="$r->notes"
-            />
+            <x-ui.note-modal :id="$r->id" :user="$r->user->name" :text="$r->notes" />
         @endif
     @endforeach
 </div>

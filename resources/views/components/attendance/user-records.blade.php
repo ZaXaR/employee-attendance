@@ -9,13 +9,20 @@
         <table class="min-w-full divide-y divide-slate-200">
             <thead class="bg-slate-50">
                 <tr>
-                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Date</th>
-                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Clock in</th>
-                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Clock out</th>
-                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Break</th>
-                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Duration</th>
-                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Location</th>
-                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Notes</th>
+                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Date
+                    </th>
+                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Clock
+                        in</th>
+                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Clock
+                        out</th>
+                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Break
+                    </th>
+                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
+                        Duration</th>
+                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
+                        Location</th>
+                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Notes
+                    </th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
@@ -44,11 +51,9 @@
                         </td>
                         <td class="px-5 py-3 text-slate-900">
                             @if ($r->notes)
-                                <button
-                                    type="button"
+                                <button type="button"
                                     onclick="window.dispatchEvent(new CustomEvent('open-note', { detail: {{ $r->id }} }))"
-                                    class="inline-flex items-center gap-1 px-2 py-1 text-xs rounded bg-amber-100 text-amber-800 hover:bg-amber-200"
-                                >
+                                    class="inline-flex items-center gap-1 px-2 py-1 text-xs rounded bg-amber-100 text-amber-800 hover:bg-amber-200">
                                     Note
                                 </button>
                             @else
@@ -68,11 +73,7 @@
     {{-- Note modals --}}
     @foreach ($records as $r)
         @if ($r->notes)
-            <x-ui.note-modal
-                :id="$r->id"
-                :user="auth()->user()?->name ?? 'User'"
-                :text="$r->notes"
-            />
+            <x-ui.note-modal :id="$r->id" :user="auth()->user()?->name ?? 'User'" :text="$r->notes" />
         @endif
     @endforeach
 </div>
