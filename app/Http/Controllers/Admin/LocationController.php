@@ -34,6 +34,15 @@ class LocationController extends Controller
 
     public function update(Request $request, Location $location)
     {
+        // Toggle status if requested
+        if ($request->has('toggle')) {
+            $location->is_active = !$location->is_active;
+            $location->save();
+
+            return redirect()->route('admin.locations.index')->with('success', 'Location status updated.');
+        }
+
+        // Regular update
         $request->validate(['name' => 'required|string|max:255']);
         $location->update(['name' => $request->name]);
 
