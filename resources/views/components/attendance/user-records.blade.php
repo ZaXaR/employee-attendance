@@ -1,6 +1,4 @@
-@props([
-    'records' => [],
-])
+@props(['records' => []])
 
 <div class="rounded-xl border border-slate-200 bg-white shadow-sm">
     <div class="border-b border-slate-200 px-5 py-3.5">
@@ -11,20 +9,13 @@
         <table class="min-w-full divide-y divide-slate-200">
             <thead class="bg-slate-50">
                 <tr>
-                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Date
-                    </th>
-                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Clock
-                        in</th>
-                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Clock
-                        out</th>
-                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Break
-                    </th>
-                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
-                        Duration</th>
-                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
-                        Location</th>
-                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Notes
-                    </th>
+                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Date</th>
+                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Clock in</th>
+                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Clock out</th>
+                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Break</th>
+                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Duration</th>
+                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Location</th>
+                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Notes</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
@@ -52,7 +43,17 @@
                             {{ optional($r->location)->name ?? '—' }}
                         </td>
                         <td class="px-5 py-3 text-slate-900">
-                            {{ $r->notes ?? '—' }}
+                            @if ($r->notes)
+                                <button
+                                    type="button"
+                                    onclick="window.dispatchEvent(new CustomEvent('open-note', { detail: {{ $r->id }} }))"
+                                    class="inline-flex items-center gap-1 px-2 py-1 text-xs rounded bg-amber-100 text-amber-800 hover:bg-amber-200"
+                                >
+                                    Note
+                                </button>
+                            @else
+                                —
+                            @endif
                         </td>
                     </tr>
                 @empty
@@ -63,4 +64,15 @@
             </tbody>
         </table>
     </div>
+
+    {{-- Note modals --}}
+    @foreach ($records as $r)
+        @if ($r->notes)
+            <x-ui.note-modal
+                :id="$r->id"
+                :user="auth()->user()?->name ?? 'User'"
+                :text="$r->notes"
+            />
+        @endif
+    @endforeach
 </div>
