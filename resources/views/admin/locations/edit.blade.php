@@ -1,31 +1,39 @@
 <x-admin-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <h2 class="text-xl font-semibold text-gray-800">Edit Location</h2>
-            <a href="{{ route('admin.locations.index') }}" class="text-sm text-gray-600 hover:underline">← Back</a>
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <h2 class="text-xl font-semibold text-slate-800">Edit Location</h2>
+            <a href="{{ route('admin.locations.index') }}"
+               class="inline-flex items-center gap-1 text-sm font-medium text-slate-600 hover:text-slate-800 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                ← Back to list
+            </a>
         </div>
     </x-slot>
 
-    <div class="py-6 px-4">
-        <div class="max-w-xl mx-auto bg-white shadow rounded p-6">
-            <form method="POST" action="{{ route('admin.locations.update', $location) }}">
-                @csrf @method('PUT')
+    <section class="px-4 py-6">
+        <div class="mx-auto max-w-xl rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+            <form method="POST" action="{{ route('admin.locations.update', $location) }}" class="space-y-6">
+                @csrf
+                @method('PUT')
 
-                {{-- Location name --}}
-                <div class="mb-4">
-                    <label for="name" class="block text-sm font-medium text-gray-700">Location name</label>
-                    <input type="text" name="name" id="name" value="{{ old('name', $location->name) }}"
-                        class="w-full px-4 py-2 border border-gray-300 rounded bg-white text-gray-900
-                                  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <div>
+                    <label for="name" class="block text-sm font-medium text-slate-700">Location name</label>
+                    <input type="text" name="name" id="name"
+                           value="{{ old('name', $location->name) }}"
+                           class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 shadow-sm placeholder-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"
+                           placeholder="Enter location name">
                     @error('name')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        <p class="mt-1 text-sm text-rose-600">{{ $message }}</p>
                     @enderror
                 </div>
 
-                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
-                    Update Location
-                </button>
+                <div class="flex justify-end">
+                    <button type="submit"
+                            class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                        <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M5 4a1 1 0 000 2h10a1 1 0 100-2H5zM4 9a1 1 0 011-1h10a1 1 0 011 1v7a2 2 0 01-2 2H6a2 2 0 01-2-2V9z"/></svg>
+                        Update location
+                    </button>
+                </div>
             </form>
         </div>
-    </div>
+    </section>
 </x-admin-layout>
