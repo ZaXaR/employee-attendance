@@ -19,22 +19,25 @@ class AttendancesController extends Controller
 
         $filters = [
             'user_id' => $request->integer('user_id'),
+            'location_id' => $request->integer('location_id'),
             'from' => $request->input('from'),
             'to' => $request->input('to'),
         ];
+
 
         $from = $filters['from'] ? Carbon::parse($filters['from'], 'UTC')->startOfDay() : null;
         $to = $filters['to'] ? Carbon::parse($filters['to'], 'UTC')->endOfDay() : null;
 
         $records = AttendanceRecord::with(['user:id,name', 'location:id,name'])
             ->when($filters['user_id'], fn($q) => $q->where('user_id', $filters['user_id']))
+            ->when($filters['location_id'], fn($q) => $q->where('location_id', $filters['location_id']))
             ->when($from, fn($q) => $q->whereDate('work_date', '>=', $from))
             ->when($to, fn($q) => $q->whereDate('work_date', '<=', $to))
             ->orderByDesc('work_date')
             ->orderByDesc('clock_in')
             ->paginate(20)
             ->withQueryString();
-            
+
         return view('admin.attendance.index', compact('users', 'locations', 'records', 'filters'));
     }
 

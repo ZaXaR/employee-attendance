@@ -21,7 +21,7 @@
                 @endif
 
                 <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm space-y-6">
-                    <x-attendance.admin-filter :users="$users" :filters="$filters" />
+                    <x-attendance.admin-filter :users="$users" :filters="$filters" :locations="$locations" />
                     <x-attendance.admin-form :users="$users" :filters="$filters" :locations="$locations" />
                 </div>
 

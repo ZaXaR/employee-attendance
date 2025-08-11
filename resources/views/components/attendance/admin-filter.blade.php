@@ -1,6 +1,6 @@
-@props(['users', 'filters'])
+@props(['users', 'filters', 'locations'])
 
-<form method="GET" class="grid grid-cols-1 gap-6 md:grid-cols-4">
+<form method="GET" class="grid grid-cols-1 gap-6 md:grid-cols-5">
     {{-- User select --}}
     <div class="flex flex-col">
         <label class="text-sm font-medium text-slate-600 mb-1">User</label>
@@ -9,6 +9,18 @@
             <option value="">All users</option>
             @foreach ($users as $u)
                 <option value="{{ $u->id }}" @selected($filters['user_id'] == $u->id)>{{ $u->name }}</option>
+            @endforeach
+        </select>
+    </div>
+
+    {{-- Location select --}}
+    <div class="flex flex-col">
+        <label class="text-sm font-medium text-slate-600 mb-1">Location</label>
+        <select name="location_id"
+            class="rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm focus:ring focus:ring-blue-200">
+            <option value="">All locations</option>
+            @foreach ($locations as $loc)
+                <option value="{{ $loc->id }}" @selected($filters['location_id'] == $loc->id)>{{ $loc->name }}</option>
             @endforeach
         </select>
     </div>
