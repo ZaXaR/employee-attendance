@@ -30,6 +30,14 @@ class AuthenticatedSessionController extends Controller
 
         $user = Auth::user();
 
+        if ($user->is_suspended) {
+            Auth::logout();
+
+            return back()->withErrors([
+                'email' => 'Your account has suspended',
+            ]);
+        }
+
         return redirect()->intended(
             $user->is_admin
             ? RouteServiceProvider::ADMIN_HOME

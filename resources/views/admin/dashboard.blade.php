@@ -1,7 +1,7 @@
 <x-admin-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Admin dashboard
+            Dashboard (Admin)
         </h2>
     </x-slot>
 
@@ -42,29 +42,12 @@
                     <table class="min-w-full divide-y divide-slate-200">
                         <thead class="bg-slate-50">
                             <tr>
-                                <th
-                                    class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
-                                    ID</th>
-                                <th
-                                    class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
-                                    Name</th>
-                                <th
-                                    class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
-                                    Email</th>
-                                <th
-                                    class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
-                                    Phone</th>
-                                <th
-                                    class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
-                                    Job Role</th>
-                                <th
-                                    class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
-                                    Admin
-                                </th>
-                                <th
-                                    class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
-                                    Created</th>
-                                <th class="px-5 py-3"></th>
+                                @foreach (['ID', 'Name', 'Email', 'Phone', 'Job Role', 'Admin', 'Status', 'Created', 'Actions'] as $heading)
+                                    <th
+                                        class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
+                                        {{ $heading }}
+                                    </th>
+                                @endforeach
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
@@ -74,9 +57,8 @@
                                     <td class="px-5 py-3 text-slate-900">{{ $user->name }}</td>
                                     <td class="px-5 py-3 text-slate-900">{{ $user->email }}</td>
                                     <td class="px-5 py-3 text-slate-900">{{ $user->phone ?? '—' }}</td>
-                                    <td class="px-5 py-3 text-slate-900">
-                                        {{ $user->jobRole?->name ?? '—' }}
-                                    </td>
+                                    <td class="px-5 py-3 text-slate-900">{{ $user->jobRole?->name ?? '—' }}</td>
+
                                     <td class="px-5 py-3 text-slate-900">
                                         @if ($user->is_admin)
                                             <span class="inline-flex items-center gap-1 text-green-600 font-medium">
@@ -91,28 +73,54 @@
                                             <span class="text-slate-500">No</span>
                                         @endif
                                     </td>
+
+                                    <td class="px-5 py-3">
+                                        @if ($user->is_suspended)
+                                            <span
+                                                class="inline-block rounded-full bg-yellow-100 px-2 py-0.5 text-xs text-yellow-800">
+                                                Suspended
+                                            </span>
+                                        @else
+                                            <span
+                                                class="inline-block rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-800">
+                                                Active
+                                            </span>
+                                        @endif
+                                    </td>
+
                                     <td class="px-5 py-3 text-slate-900">{{ $user->created_at->format('Y-m-d') }}</td>
+
                                     <td class="px-5 py-3 text-right">
                                         <div class="inline-flex items-center gap-2">
                                             <a href="{{ route('admin.users.edit', $user) }}"
                                                 class="rounded-lg bg-amber-500 px-3 py-1.5 text-white hover:bg-amber-600">
                                                 Edit
                                             </a>
-                                            <form method="POST" action="{{ route('admin.users.destroy', $user) }}"
-                                                onsubmit="return confirm('Delete this user?');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit"
-                                                    class="rounded-lg bg-red-600 px-3 py-1.5 text-white hover:bg-red-700">
-                                                    Delete
-                                                </button>
-                                            </form>
+
+                                            @if ($user->is_suspended)
+                                                <form method="POST" action="{{ route('admin.users.resume', $user) }}">
+                                                    @csrf
+                                                    <button type="submit"
+                                                        class="rounded-lg bg-green-600 px-3 py-1.5 text-white hover:bg-green-700">
+                                                        Resume
+                                                    </button>
+                                                </form>
+                                            @elseif(auth()->id() !== $user->id)
+                                                <form method="POST" action="{{ route('admin.users.suspend', $user) }}"
+                                                    onsubmit="return confirm('Suspend this user?');">
+                                                    @csrf
+                                                    <button type="submit"
+                                                        class="rounded-lg bg-slate-500 px-3 py-1.5 text-white hover:bg-slate-600">
+                                                        Suspend
+                                                    </button>
+                                                </form>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td class="px-5 py-6 text-slate-500" colspan="7">No users found.</td>
+                                    <td class="px-5 py-6 text-slate-500 text-center" colspan="9">No users found.</td>
                                 </tr>
                             @endforelse
                         </tbody>

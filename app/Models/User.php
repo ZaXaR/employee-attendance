@@ -18,6 +18,7 @@ class User extends Authenticatable
         'phone',
         'job_role_id',
         'is_admin',
+        'is_suspended',
     ];
 
     protected $hidden = [
@@ -27,6 +28,7 @@ class User extends Authenticatable
 
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'is_suspended' => 'boolean',
     ];
 
     public function attendanceRecords()
@@ -39,9 +41,14 @@ class User extends Authenticatable
         return $this->belongsTo(JobRole::class);
     }
 
+    public function isSuspended(): bool
+    {
+        return $this->is_suspended;
+    }
+
     public function isAdmin(): bool
     {
-        return (bool) $this->is_admin;
+        return $this->is_admin;
     }
 
     // public function location()

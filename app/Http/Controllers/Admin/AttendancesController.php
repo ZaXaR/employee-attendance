@@ -24,9 +24,13 @@ class AttendancesController extends Controller
             'to' => $request->input('to'),
         ];
 
-
-        $from = $filters['from'] ? Carbon::parse($filters['from'], 'UTC')->startOfDay() : null;
-        $to = $filters['to'] ? Carbon::parse($filters['to'], 'UTC')->endOfDay() : null;
+        if (!$filters['from'] && !$filters['to']) {
+            $from = now('UTC')->startOfDay();
+            $to = now('UTC')->endOfDay();
+        } else {
+            $from = $filters['from'] ? Carbon::parse($filters['from'], 'UTC')->startOfDay() : null;
+            $to = $filters['to'] ? Carbon::parse($filters['to'], 'UTC')->endOfDay() : null;
+        }
 
         $records = AttendanceRecord::with(['user:id,name', 'location:id,name'])
             ->when($filters['user_id'], fn($q) => $q->where('user_id', $filters['user_id']))
