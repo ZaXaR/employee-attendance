@@ -10,15 +10,13 @@
             <div class="space-y-6">
                 {{-- Flash messages --}}
                 @if (session('success'))
-                    <div class="rounded-lg border border-green-200 bg-green-50 text-green-800 px-4 py-3">
-                        {{ session('success') }}
-                    </div>
+                    <x-ui.message type="success" :message="session('success')" />
                 @endif
+
                 @if ($errors->any())
-                    <div class="rounded-lg border border-red-200 bg-red-50 text-red-800 px-4 py-3">
-                        {{ $errors->first() }}
-                    </div>
+                    <x-ui.message type="error" :message="$errors->first()" />
                 @endif
+
 
                 <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm space-y-6">
                     <x-attendance.admin-filter :users="$users" :filters="$filters" :locations="$locations" />

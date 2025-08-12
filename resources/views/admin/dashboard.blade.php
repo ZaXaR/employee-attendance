@@ -8,24 +8,21 @@
     <div class="py-10 px-4">
         <div class="mx-auto max-w-7xl sm:px-6 lg:px-8 space-y-8">
 
+            {{-- Flash messages --}}
+            @if (session('success'))
+                <x-ui.message type="success" :message="session('success')" />
+            @endif
+
+            @if ($errors->any())
+                <x-ui.message type="error" :message="$errors->first()" />
+            @endif
+
             {{-- Stats cards --}}
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                <div class="rounded-lg border border-slate-200 bg-white p-4">
-                    <div class="text-sm text-slate-500">Total users</div>
-                    <div class="mt-1 text-2xl font-semibold text-slate-800">{{ $stats['total'] }}</div>
-                </div>
-                <div class="rounded-lg border border-slate-200 bg-white p-4">
-                    <div class="text-sm text-slate-500">Admins</div>
-                    <div class="mt-1 text-2xl font-semibold text-slate-800">{{ $stats['admins'] }}</div>
-                </div>
-                <div class="rounded-lg border border-slate-200 bg-white p-4">
-                    <div class="text-sm text-slate-500">Members</div>
-                    <div class="mt-1 text-2xl font-semibold text-slate-800">{{ $stats['members'] }}</div>
-                </div>
-                <div class="rounded-lg border border-slate-200 bg-white p-4">
-                    <div class="text-sm text-slate-500">New last 7 days</div>
-                    <div class="mt-1 text-2xl font-semibold text-slate-800">{{ $stats['new_last_7'] }}</div>
-                </div>
+                <x-ui.stats-card label="Total users" :value="$stats['total']" />
+                <x-ui.stats-card label="Admins" :value="$stats['admins']" />
+                <x-ui.stats-card label="Members" :value="$stats['members']" />
+                <x-ui.stats-card label="New last 7 days" :value="$stats['new_last_7']" />
             </div>
 
             {{-- Users table --}}

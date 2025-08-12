@@ -20,6 +20,8 @@
     <!-- Flatpickr JS -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
+    <script src="https://unpkg.com/imask"></script>
+
     <script src="/js/app.js"></script>
     <link rel="stylesheet" href="/css/app.css">
 

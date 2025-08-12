@@ -21,3 +21,12 @@ document.addEventListener("DOMContentLoaded", function () {
         time_24hr: true,
     });
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+    const phoneInput = document.querySelector("[name=phone]");
+    if (phoneInput) {
+        IMask(phoneInput, {
+            mask: "+{000} 000 000 000[ 000]",
+        });
+    }
+});

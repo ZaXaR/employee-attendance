@@ -58,7 +58,11 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8', // add |confirmed if you add confirmation field
-            'phone' => 'nullable|string|max:20',
+            'phone' => [
+                'nullable',
+                'string',
+                'regex:/^\+?[0-9\s\-().]{7,20}$/',
+            ],
             'job_role_id' => 'nullable|exists:job_roles,id',
             'is_admin' => 'sometimes|boolean',
         ]);
