@@ -26,6 +26,12 @@
                     </x-nav-link>
                     @if (Auth::user()->isAdmin())
                         <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                            <svg class="w-4 h-4 mr-2 text-slate-500" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path d="M4.5 12a7.5 7.5 0 0112.75-5.25M19.5 12a7.5 7.5 0 01-12.75 5.25" />
+                                <path d="M17 6v3h-3M7 18v-3h3" />
+                            </svg>
                             {{ __('User Dashboard') }}
                         </x-nav-link>
                     @endif
@@ -103,6 +109,12 @@
             </x-responsive-nav-link>
             @if (Auth::user()->isAdmin())
                 <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                    <svg class="w-4 h-4 mr-2 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4.5 12a7.5 7.5 0 0112.75-5.25M19.5 12a7.5 7.5 0 01-12.75 5.25" />
+                        <path d="M17 6v3h-3M7 18v-3h3" />
+                    </svg>
                     {{ __('User Dashboard') }}
                 </x-responsive-nav-link>
             @endif
