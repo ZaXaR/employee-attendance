@@ -35,7 +35,8 @@
                     </a>
                 </div>
 
-                <div class="overflow-x-auto">
+                {{-- Desktop table --}}
+                <div class="overflow-x-auto hidden md:block">
                     <table class="min-w-full divide-y divide-slate-200">
                         <thead class="bg-slate-50">
                             <tr>
@@ -55,7 +56,6 @@
                                     <td class="px-5 py-3 text-slate-900">{{ $user->email }}</td>
                                     <td class="px-5 py-3 text-slate-900">{{ $user->phone ?? '—' }}</td>
                                     <td class="px-5 py-3 text-slate-900">{{ $user->jobRole?->name ?? '—' }}</td>
-
                                     <td class="px-5 py-3 text-slate-900">
                                         @if ($user->is_admin)
                                             <span class="inline-flex items-center gap-1 text-green-600 font-medium">
@@ -70,7 +70,6 @@
                                             <span class="text-slate-500">No</span>
                                         @endif
                                     </td>
-
                                     <td class="px-5 py-3">
                                         @if ($user->is_suspended)
                                             <span
@@ -84,16 +83,13 @@
                                             </span>
                                         @endif
                                     </td>
-
                                     <td class="px-5 py-3 text-slate-900">{{ $user->created_at->format('Y-m-d') }}</td>
-
                                     <td class="px-5 py-3 text-right">
                                         <div class="inline-flex items-center gap-2">
                                             <a href="{{ route('admin.users.edit', $user) }}"
                                                 class="rounded-lg bg-amber-500 px-3 py-1.5 text-white hover:bg-amber-600">
                                                 Edit
                                             </a>
-
                                             @if ($user->is_suspended)
                                                 <form method="POST" action="{{ route('admin.users.resume', $user) }}">
                                                     @csrf
@@ -122,6 +118,66 @@
                             @endforelse
                         </tbody>
                     </table>
+                </div>
+                {{-- 📱 Mobile cards --}}
+                <div class="md:hidden divide-y divide-slate-100">
+                    @forelse ($users as $user)
+                        <div class="px-5 py-4">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-sm font-medium text-slate-800">{{ $user->name }}</span>
+                                <span class="text-xs text-slate-500">{{ $user->created_at->format('Y-m-d') }}</span>
+                            </div>
+                            <div class="text-sm text-slate-700 space-y-1">
+                                <div><span class="font-semibold">Email:</span> {{ $user->email }}</div>
+                                <div><span class="font-semibold">Phone:</span> {{ $user->phone ?? '—' }}</div>
+                                <div><span class="font-semibold">Role:</span> {{ $user->jobRole?->name ?? '—' }}</div>
+                                <div>
+                                    <span class="font-semibold">Admin:</span>
+                                    @if ($user->is_admin)
+                                        <span class="text-green-600 font-medium">Yes</span>
+                                    @else
+                                        <span class="text-slate-500">No</span>
+                                    @endif
+                                </div>
+                                <div>
+                                    <span class="font-semibold">Status:</span>
+                                    @if ($user->is_suspended)
+                                        <span
+                                            class="inline-block rounded-full bg-yellow-100 px-2 py-0.5 text-xs text-yellow-800">Suspended</span>
+                                    @else
+                                        <span
+                                            class="inline-block rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-800">Active</span>
+                                    @endif
+                                </div>
+                                <div class="pt-2 flex gap-2">
+                                    <a href="{{ route('admin.users.edit', $user) }}"
+                                        class="rounded-lg bg-amber-500 px-3 py-1.5 text-xs text-white hover:bg-amber-600">
+                                        Edit
+                                    </a>
+                                    @if ($user->is_suspended)
+                                        <form method="POST" action="{{ route('admin.users.resume', $user) }}">
+                                            @csrf
+                                            <button type="submit"
+                                                class="rounded-lg bg-green-600 px-3 py-1.5 text-xs text-white hover:bg-green-700">
+                                                Resume
+                                            </button>
+                                        </form>
+                                    @elseif(auth()->id() !== $user->id)
+                                        <form method="POST" action="{{ route('admin.users.suspend', $user) }}"
+                                            onsubmit="return confirm('Suspend this user?');">
+                                            @csrf
+                                            <button type="submit"
+                                                class="rounded-lg bg-slate-500 px-3 py-1.5 text-xs text-white hover:bg-slate-600">
+                                                Suspend
+                                            </button>
+                                        </form>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="px-5 py-6 text-slate-500 text-center">No users found.</div>
+                    @endforelse
                 </div>
 
                 <div class="px-5 py-4">

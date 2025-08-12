@@ -5,7 +5,8 @@
         <h3 class="text-base font-semibold text-slate-800">Your recent records</h3>
     </div>
 
-    <div class="overflow-x-auto">
+    {{-- Desktop table --}}
+    <div class="overflow-x-auto hidden md:block">
         <table class="min-w-full divide-y divide-slate-200">
             <thead class="bg-slate-50">
                 <tr>
@@ -46,9 +47,7 @@
                                 —
                             @endif
                         </td>
-                        <td class="px-5 py-3 text-slate-900">
-                            {{ optional($r->location)->name ?? '—' }}
-                        </td>
+                        <td class="px-5 py-3 text-slate-900">{{ optional($r->location)->name ?? '—' }}</td>
                         <td class="px-5 py-3 text-slate-900">
                             @if ($r->notes)
                                 <button type="button"
@@ -68,6 +67,52 @@
                 @endforelse
             </tbody>
         </table>
+    </div>
+
+    {{-- Mobile cards --}}
+    <div class="md:hidden divide-y divide-slate-100">
+        @forelse ($records as $r)
+            <div class="px-5 py-4">
+                <div class="flex justify-between items-center mb-1">
+                    <span
+                        class="text-sm font-medium text-slate-800">{{ optional($r->work_date)->toDateString() }}</span>
+                    <span class="text-xs text-slate-500">{{ optional($r->location)->name ?? '—' }}</span>
+                </div>
+                <div class="text-sm text-slate-700">
+                    <div><span class="font-semibold">In:</span> {{ optional($r->clock_in)->format('H:i') ?? '—' }}
+                    </div>
+                    <div><span class="font-semibold">Out:</span> {{ optional($r->clock_out)->format('H:i') ?? '—' }}
+                    </div>
+                    <div><span class="font-semibold">Break:</span> {{ $r->break_time ?? 0 }} min</div>
+                    <div>
+                        <span class="font-semibold">Duration:</span>
+                        @if ($r->clock_in)
+                            @php
+                                $endTime = $r->clock_out ?? now();
+                                $duration = $endTime->diffAsCarbonInterval($r->clock_in);
+                                $totalMinutes = $duration->totalMinutes - ($r->break_time ?? 0);
+                                $hours = floor($totalMinutes / 60);
+                                $minutes = $totalMinutes % 60;
+                            @endphp
+                            {{ $hours > 0 ? $hours . 'h ' : '' }}{{ $minutes }} min
+                        @else
+                            —
+                        @endif
+                    </div>
+                    @if ($r->notes)
+                        <div class="mt-2">
+                            <button type="button"
+                                onclick="window.dispatchEvent(new CustomEvent('open-note', { detail: {{ $r->id }} }))"
+                                class="inline-flex items-center gap-1 px-2 py-1 text-xs rounded bg-amber-100 text-amber-800 hover:bg-amber-200">
+                                Note
+                            </button>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        @empty
+            <div class="px-5 py-6 text-slate-500 text-center">No records found.</div>
+        @endforelse
     </div>
 
     {{-- Note modals --}}
