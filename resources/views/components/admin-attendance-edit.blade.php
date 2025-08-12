@@ -32,12 +32,11 @@
                         <input type="text" name="clock_in" value="{{ $record->clock_in?->format('H:i') }}"
                             class="timepicker w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-800 shadow-sm focus:border-emerald-500 focus:ring focus:ring-emerald-200/50"
                             placeholder="HH:MM">
-@admin
-    <button type="button"
-            onclick="this.previousElementSibling.value = ''"
-            class="text-slate-400 hover:text-red-500 px-2 text-lg font-bold leading-none"
-            title="Clear">×</button>
-@endadmin
+                        @admin
+                            <button type="button" onclick="this.previousElementSibling.value = ''"
+                                class="text-slate-400 hover:text-red-500 px-2 text-lg font-bold leading-none"
+                                title="Clear">×</button>
+                        @endadmin
 
                     </div>
                 </div>
@@ -47,12 +46,11 @@
                         <input type="text" name="clock_out" value="{{ $record->clock_out?->format('H:i') }}"
                             class="timepicker w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-800 shadow-sm focus:border-emerald-500 focus:ring focus:ring-emerald-200/50"
                             placeholder="HH:MM">
-@admin
-    <button type="button"
-            onclick="this.previousElementSibling.value = ''"
-            class="text-slate-400 hover:text-red-500 px-2 text-lg font-bold leading-none"
-            title="Clear">×</button>
-@endadmin
+                        @admin
+                            <button type="button" onclick="this.previousElementSibling.value = ''"
+                                class="text-slate-400 hover:text-red-500 px-2 text-lg font-bold leading-none"
+                                title="Clear">×</button>
+                        @endadmin
 
                     </div>
                 </div>
