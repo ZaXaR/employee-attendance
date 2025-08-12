@@ -14,9 +14,6 @@ class AttendancesController extends Controller
 {
     public function index(Request $request)
     {
-        $users = User::orderBy('name')->select('id', 'name')->get();
-        $locations = Location::orderBy('name')->select('id', 'name')->get();
-
         $filters = [
             'user_id' => $request->integer('user_id'),
             'location_id' => $request->integer('location_id'),
@@ -24,25 +21,23 @@ class AttendancesController extends Controller
             'to' => $request->input('to'),
         ];
 
-        if (!$filters['from'] && !$filters['to']) {
-            $from = now('UTC')->startOfDay();
-            $to = now('UTC')->endOfDay();
-        } else {
-            $from = $filters['from'] ? Carbon::parse($filters['from'], 'UTC')->startOfDay() : null;
-            $to = $filters['to'] ? Carbon::parse($filters['to'], 'UTC')->endOfDay() : null;
-        }
+        $from = $filters['from'] ? Carbon::parse($filters['from'], 'UTC')->startOfDay() : now('UTC')->startOfDay();
+        $to = $filters['to'] ? Carbon::parse($filters['to'], 'UTC')->endOfDay() : now('UTC')->endOfDay();
 
-        $records = AttendanceRecord::with(['user:id,name', 'location:id,name'])
+        $records = AttendanceRecord::with(['user:id,name', 'location:id,name,is_active'])
             ->when($filters['user_id'], fn($q) => $q->where('user_id', $filters['user_id']))
             ->when($filters['location_id'], fn($q) => $q->where('location_id', $filters['location_id']))
-            ->when($from, fn($q) => $q->whereDate('work_date', '>=', $from))
-            ->when($to, fn($q) => $q->whereDate('work_date', '<=', $to))
+            ->whereBetween('work_date', [$from, $to])
             ->orderByDesc('work_date')
             ->orderByDesc('clock_in')
             ->paginate(20)
             ->withQueryString();
 
-        return view('admin.attendance.index', compact('users', 'locations', 'records', 'filters'));
+        $users = User::orderBy('name')->select('id', 'name')->get();
+        $locations = Location::orderBy('name')->select('id', 'name', 'is_active')->get();
+        $activeLocations = $locations->where('is_active', true);
+
+        return view('admin.attendance.index', compact('users', 'locations', 'activeLocations', 'records', 'filters'));
     }
 
     public function dashboard()
@@ -60,7 +55,7 @@ class AttendancesController extends Controller
             ->take(10)
             ->get();
 
-        $locations = Location::orderBy('name')->get();
+        $locations = Location::active()->orderBy('name')->get();
 
         return view('dashboard', compact('records', 'hasTodayRecord', 'locations'));
     }
@@ -75,9 +70,7 @@ class AttendancesController extends Controller
             ->exists();
 
         if ($exists) {
-            return back()
-                ->withErrors(['work_date' => 'This user already has a record for this date.'])
-                ->withInput();
+            return back()->withErrors(['work_date' => 'This user already has a record for this date.'])->withInput();
         }
 
         if ($clockIn && $clockOut && $clockOut->lte($clockIn)) {
@@ -140,6 +133,7 @@ class AttendancesController extends Controller
         }
 
         $record->delete();
+
         return back()->with('success', 'Record deleted.');
     }
 
@@ -147,27 +141,31 @@ class AttendancesController extends Controller
     {
         $isAdmin = $request->user()->isAdmin();
 
-        if ($isAdmin) {
-            // Admin rules
-            $rules = [
+        $rules = $isAdmin
+            ? [
+                // admin rules
                 'user_id' => ['required', Rule::exists('users', 'id')],
                 'work_date' => ['required', 'date'],
                 'clock_in' => ['nullable', 'date_format:H:i'],
                 'clock_out' => ['nullable', 'date_format:H:i'],
                 'break_time' => ['nullable', 'integer', 'min:0'],
-                'location_id' => ['nullable', Rule::exists('locations', 'id')],
+                'location_id' => [
+                    'nullable',
+                    Rule::exists('locations', 'id')->where(fn($q) => $q->where('is_active', true)),
+                ],
                 'notes' => ['nullable', 'string', 'max:1000'],
-            ];
-        } else {
-            // User rules
-            $rules = [
+            ]
+            : [
+                // user rules
                 'clock_in' => ['required', 'date_format:H:i'],
                 'clock_out' => ['required', 'date_format:H:i'],
                 'break_time' => ['required', 'integer', 'min:0'],
-                'location_id' => ['required', Rule::exists('locations', 'id')],
+                'location_id' => [
+                    'required',
+                    Rule::exists('locations', 'id')->where(fn($q) => $q->where('is_active', true)),
+                ],
                 'notes' => ['nullable', 'string', 'max:1000'],
             ];
-        }
 
         $validated = $request->validate($rules);
 
@@ -178,7 +176,6 @@ class AttendancesController extends Controller
 
         return $validated;
     }
-
 
     private function assembleTimes(string $date, ?string $in, ?string $out): array
     {

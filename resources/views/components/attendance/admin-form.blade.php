@@ -41,7 +41,11 @@
                 class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm">
                 <option value="">—</option>
                 @foreach ($locations as $loc)
-                    <option value="{{ $loc->id }}">{{ $loc->name }}</option>
+                    @if ($loc->is_active)
+                        <option value="{{ $loc->id }}" @selected($filters['location_id'] == $loc->id)>
+                            {{ $loc->name }}
+                        </option>
+                    @endif
                 @endforeach
             </select>
         </div>
